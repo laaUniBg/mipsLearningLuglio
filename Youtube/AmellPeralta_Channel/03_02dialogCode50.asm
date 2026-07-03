@@ -16,14 +16,14 @@
 	beq $a0, 2, gotoAnnulla
 
 gotoSi:
-	la $a0, "ho cliccato si"
+	la $a0, mesSi
 	syscall
 	
 gotoNo:
-	la $a0 "ho cliccato no"
+	la $a0 mesNo
 	syscall
 
 gotoAnnulla:
-	la $a0 "ho cliccato annulla"
+	la $a0 mesAnnulla
 	syscall
 	
