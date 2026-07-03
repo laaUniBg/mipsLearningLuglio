@@ -18,12 +18,20 @@
 gotoSi:
 	la $a0, mesSi
 	syscall
+	j fineProgramma
 	
 gotoNo:
 	la $a0 mesNo
 	syscall
+	j fineProgramma
 
 gotoAnnulla:
 	la $a0 mesAnnulla
 	syscall
+	j fineProgramma
+	
+fineProgramma:
+	li $v0, 10 #exit programma
+	syscall
+	j fineProgramma
 	
