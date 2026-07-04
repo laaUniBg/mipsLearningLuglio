@@ -21,7 +21,7 @@ main:
 	
 	li $v0, 3 # write double code
 	# ldc1 $f12, 0($t0) # lenta # uso indirizzo di risultato che ho già riempito con store
-	mov.d $f12, $f8
+	mov.d $f12, $f8 # ho gia il valore, perchè dovrei leggerlo dalla ram?
 	syscall
 	
 	j exit
