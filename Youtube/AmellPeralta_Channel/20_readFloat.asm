@@ -1,14 +1,16 @@
 .data
 	message: 		.asciiz "Enter the value of PI: "
-	zeroAsFloat: 	.float 0.0
+	# zeroAsFloat: 	.float 0.0
 .text
 .globl main
 
 main:
-	lwc1 $f4, zeroAsFloat
+	# la $t0, zeroAsFloat
+	# lwc1 $f4, 0($t0)
 	jal printMessage
 	jal readFloat
 	jal printFloat
+	j finishProgram
 	
 readFloat:
 	li $v0, 6
@@ -17,7 +19,8 @@ readFloat:
 	
 printFloat:
 	li $v0, 2
-	# move.s $f12, $f0 # NON COMPILA ERRORE, SALVO ERRORE PRIMA DI ALTRE MODIFICHE
+	mov.s $f12, $f0
+	syscall
 	jr $ra
 			
 printMessage:
