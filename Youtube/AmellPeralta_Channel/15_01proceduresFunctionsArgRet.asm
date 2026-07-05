@@ -1,10 +1,9 @@
 .data
-	message: .asciiz "Hi everybody. \nmy name is Anas."
+
 .text
 .globl main
 
 # procedure is function (like c++/js)
-
 main:
 	li $a1, 50
 	li $a2, 100	
@@ -16,7 +15,6 @@ main:
 	syscall
 	
 	j finishProgram
-
 
 addNumbers:
 	add $v1, $a1, $a2
