@@ -20,6 +20,7 @@ printValue:
 	li $v0, 1
 	move $a0, $s0
 	syscall
+	jr $ra
 	
 increaseMyRegister:
 	addi $sp, $sp, -8
