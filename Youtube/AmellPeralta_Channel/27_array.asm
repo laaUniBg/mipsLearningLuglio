@@ -1,6 +1,6 @@
 .data
 	# myArray: .space 12 # 12/4=3 words
-	myArray: .word 10,20,30,40
+	myArray: .word 12, 24, 666, 89
 	enterStr: .asciiz "\n"
 .text
 .globl main
