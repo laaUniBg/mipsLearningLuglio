@@ -5,13 +5,6 @@
 .text
 .globl main
 
-# TODO RISOLVI ERRORE COMPILAZIONE: 
-# 20
-# 40
-# 60
-# 80
-# 80
-
 main:
 	li $a1, 0 					# initilize index
 	li $v1, 0					# thisSomma
