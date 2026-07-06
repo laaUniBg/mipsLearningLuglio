@@ -15,6 +15,7 @@
 main:
 	li $a1, 0 					# initilize index
 	li $v1, 0					# thisSomma
+	la $t2, myArray				# indirizzoArray
 	
 	j LOOP1START
 LOOP1EXIT:
@@ -29,15 +30,6 @@ LOOP1EXIT:
 LOOP1START:
 	bge $a1, 4, LOOP1EXIT 		# if(index>=4) exit();
 	
-	addi $a1, $a1, 1 			# thisIndex
-	
-	la $t2, myArray
-	add $t2, $t2, 4 			# thisAddress
-	
-	lw $t3, 0($t2)				# thisValue
-	
-	add $v1, $v1, $t3			# thisSomma
-	
 	li $v0, 1
 	move $a0, $v1
 	syscall
@@ -46,6 +38,10 @@ LOOP1START:
 	la $a0, enterStr
 	syscall
 	
+	addi $a1, $a1, 1 			# thisIndex
+	add $t2, $t2, 4 			# thisAddress
+	lw $t3, 0($t2)				# thisValue
+	add $v1, $v1, $t3			# thisSomma
 	
 	j LOOP1START
 
