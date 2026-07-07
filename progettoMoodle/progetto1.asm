@@ -5,7 +5,7 @@
 	# STUDENT DATA
 	arrayStudentId:			.space 200  	# 50 studenti, 4 byte (word)
 	arrayAge: 				.space 200  
-	arrayYearOfEnrollment:  .space 200
+	arrayYearEnrollment:  	.space 200
 	arrayNumberPassedExams: .space 200
 	arrayStatus: 			.space 200
 
@@ -23,76 +23,116 @@
 	# STUDENT QUESTION STRINGS
 	strQuestionFirstName:		.asciiz "scrivi nome studente: "
 	strQuestionLastName:		.asciiz "scrivi cognome studente: "
-	strQuestionAge: 			.asciiz "scrivi l'et√† studente: "
+	strQuestionAge: 			.asciiz "scrivi l'eta† studente: "
 	strQuestionYearEnrollment: 	.asciiz "scrivi anno di iscrizione: "
 	strQuestionStudentId: 		.asciiz "scrivi l'id dello studente: "
+	strNewLine: 				.asciiz "\n"
+	strAnswerGenericInput: 	.asciiz "il valore di input Ë: "
 .text
 .globl main
 
 main:
-
+	jal insertNewStudent
 	j finishProgram
 
 
 insertNewStudent:
 	subi $sp, $sp, WORDSIZE
 	sw $ra, 0($sp)
-
+	
+	# nome
 	la $a2, strQuestionFirstName
 	jal	printString
+	
 	la $a2, arrayFirstName
 	jal returnThisStudentStringAddress
-
+	
+	move $a2, $v1
+	jal getInputString
+	
+	
+	# cognome
 	la $a2, strQuestionLastName
 	jal printString
+	
 	la $a2, arrayLastName
 	jal returnThisStudentStringAddress
-
+	
+	move $a2, $v1
+	jal getInputString
+	
+	# eta
 	la $a2, strQuestionAge
-	jal printString,
+	jal printString
+	
 	la $a2, arrayAge
+	jal returnThisStudentIntegerAddress
+	
+	move $a2, $v1
+	jal getInputInteger
 
+	# year
 	la $a2, strQuestionYearEnrollment
 	jal printString
+	
 	la $a2, arrayYearEnrollment
-
+	jal returnThisStudentIntegerAddress
+	
+	move $a2, $v1
+	jal getInputInteger
+	
+	# id
 	la $a2, strQuestionStudentId
 	jal printString
+	
 	la $a2, arrayStudentId
+	jal returnThisStudentIntegerAddress
+	
+	move $a2, $v1
+	jal getInputInteger
 
-	lw $a2, indexLastStudent
-	jal incrementCounter
+	# incrementa
+	la $a2, indexLastStudent
+	jal incrementCounterFromIntegerAdress
 
 	lw $ra, 0($sp)
 	addi $sp, $sp, WORDSIZE
 
 	jr $ra
+	
+# $a2: indirizzoWord
+returnThisStudentIntegerAddress:
+	la $t0, indexLastStudent
+	lw $t1, 0($t0)				# $t1: indexLastStudent
+	
+	mul $t2, $t1, WORDSIZE		# $t2: OFFSET = indexLastStudent * 4
+	add $t3, $a2, $t2			# $t3: intArr[i] = indirizzo array + offset
+	
+	move $v1, $t3				# return $t3: indirizzo word nell'array
+	
+	jr $ra
+	
 
 # $a2: indirizzoArrayString
+# $v1: indirizzoStringa nell'array
 returnThisStudentStringAddress:
-	subi $sp, $sp, WORDSIZE
-	sw $ra, 0($sp)
-	
 	la $t0, indexLastStudent
 	lw $t1, 0($t0)				# indexLastStudent
 	
-	mul $t2, $t1, STRINGLENGTH	# indexLastStudent * 20 = OFFSET
-	addi $t3, $a2, $v1			# indirizzo stringa + OFFSET = indirizzo che vogliamo
+	mul $t2, $t1, STRINGLENGTH	# $t2: OFFSET = indexLastStudent * 20
+	add $t3, $a2, $t2			# $t3: indirizzo che vogliamo = indirizzo stringa + OFFSET
 	
-	move $v1, $t3
-	
-	lw $ra, 0($sp)
-	addi $sp, $sp, WORDSIZE
+	move $v1, $t3				# return $t3: indirizzo che vogliamo
 	
 	jr $ra
 
 # $a2: indirizzoWordDaIncrementare
 # $v1: valoreWordIncrementato
-incrementCounter:
-	move $t0, $a2
-	lw $t1, 0($t0)
+incrementCounterFromIntegerAdress:
+	lw $t1, 0($a2)
 	addi $t1, $t1, 1
-	sw $t1, 0($t0)
+	sw $t1, 0($a2)
+	
 	move $v1, $t1
 	jr $ra
 
@@ -102,27 +142,91 @@ printString:
 	move $a0, $a2
 	syscall
 	jr $ra
+	
+# $a2: indirizzoStringa
+printGenericAnswerString:
+	subi $sp, $sp, WORDSIZE
+	sw $ra, 0($sp)
+	
+	move $t0, $a2
+	
+	la $a2, strAnswerGenericInput
+	jal printString
+	
+	li $v0, 4
+	move $a2, $t0
+	move $a0, $a2
+	syscall
+	
+	lw $ra, 0($sp)
+	addi $sp, $sp, WORDSIZE
+	
+	jr $ra
+
+# $a2: integer value (non indirizzo ma value diretto)
+printGenericAnswerIntegerValue:
+	subi $sp, $sp, WORDSIZE
+	sw $ra, 0($sp)
+	
+	move $t0, $a2
+	
+	la $a2, strAnswerGenericInput
+	jal printString
+	
+	move $a2, $t0
+	li $v0, 1
+	move $a0, $a2
+	syscall
+	
+	lw $ra, 0($sp)
+	addi $sp, $sp, WORDSIZE
+	
+	jr $ra
 
 # $a2: indirizzo stringa
 # $v1: stringa input ottenuta
 getInputString:
+	subi $sp, $sp, WORDSIZE
+	sw $ra, 0($sp)
+	
 	li $v0, 8
-	
-	move $a0, $a2
+	move $a0, $a2			# scrittura stringa gi‡ in ram
 	li $a1, STRINGLENGTH
-	
 	syscall
 	
-	move $v1, $v0
+	move $t0, $a2
+	la $a2, strNewLine
+	jal printString
+	
+	move $a2, $t0
+	move $v1, $a2
+	jal printGenericAnswerString
+	
+	lw $ra, 0($sp)
+	addi $sp, $sp, WORDSIZE
+	
 	jr $ra
 
 # $a2: indirizzo integer
-# $v1: integer input ottenuta
+# $v1: integer input value ottenuta
 getInputInteger:
+	subi $sp, $sp, WORDSIZE
+	sw $ra, 0($sp)
+	
 	li $v0, 5
-	move $a0, $a2
 	syscall
-	move $v1, $v0
+	sw $v0, 0($a2)
+	
+	la $a2, strNewLine
+	jal printString
+	
+	move $v1, $v0	
+	move $a2, $v1
+	jal printGenericAnswerIntegerValue
+	
+	lw $ra, 0($sp)
+	addi $sp, $sp, WORDSIZE
+	
 	jr $ra
 
 finishProgram:
