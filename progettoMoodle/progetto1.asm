@@ -32,31 +32,63 @@ main:
 
 
 insertNewStudent:
-	la $a1, strQuestionFirstName
+	addi $sp, $sp, -4
+	sw $ra, 0(sp)
+
+	la $a2, strQuestionFirstName
 	jal	printString
-	
 
-	la $a1, strQuestionLastName
+	la $a2, strQuestionLastName
 	jal printString
 
-	la $a1, strQuestionAge
+	la $a2, strQuestionAge
 	jal printString
 
-	la $a1, strQuestionYearEnrollment
+	la $a2, strQuestionYearEnrollment
 	jal printString
 
-	la $a1, strQuestionStudentId
+	la $a2, strQuestionStudentId
 	jal printString
 
-	la $a1
+	lw $a2, indexLastStudent
+	jal incrementCounter
+
+	lw $ra, 0(sp)
+	addi $sp, $sp, 4
+
 	jr $ra
 
+# $a2: indirizzoWordDaIncrementare
+incrementCounter:
+	la $t0, $a2
+	lw $t1, 0($t0)
+	addi $t1, $t1, 1
+	move $v1, $t1
+	sw $v1, 0($t0)
+	jr $ra
 
+# $a2: indirizzo stringa da printare
 printString:
 	li $v0, 4
-	move $a0, $a1
-	move $v1, $v0
+	move $a0, $a2
 	syscall
+	jr $ra
+
+# $a2: indirizzo stringa nella ram da scriverci su
+readString20char:
+	li $v0, 8
+	move $a0, $a2
+	move $a1, 20
+	syscall
+	move $v1, $v0
+	jr $ra
+
+# $a2: indirizzo integer
+readInteger:
+	li $v0, 5
+	move $a0, $a2
+	syscall
+	move $v1, $v0
 	jr $ra
 
 finishProgram:
