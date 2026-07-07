@@ -1,3 +1,6 @@
+.eqv WORDSIZE 4
+.eqv STRINGLENGTH 20
+
 .data
 	# STUDENT DATA
 	arrayStudentId:			.space 200  	# 50 studenti, 4 byte (word)
@@ -32,7 +35,7 @@ main:
 
 
 insertNewStudent:
-	addi $sp, $sp, -4
+	subi $sp, $sp, WORDSIZE
 	sw $ra, 0(sp)
 
 	la $a2, strQuestionFirstName
@@ -53,9 +56,14 @@ insertNewStudent:
 	lw $a2, indexLastStudent
 	jal incrementCounter
 
-	lw $ra, 0(sp)
-	addi $sp, $sp, 4
+	lw $ra, 0($sp)
+	addi $sp, $sp, WORDSIZE
 
+	jr $ra
+
+# $a2: indexLastStudent
+calcolateOffset20String:
+	mul $v1, $a2, STRINGLENGTH
 	jr $ra
 
 # $a2: indirizzoWordDaIncrementare
@@ -78,7 +86,7 @@ printString:
 readString20char:
 	li $v0, 8
 	move $a0, $a2
-	move $a1, 20
+	move $a1, STRINGLENGTH
 	syscall
 	move $v1, $v0
 	jr $ra
