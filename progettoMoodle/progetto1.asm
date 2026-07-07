@@ -36,22 +36,29 @@ main:
 
 insertNewStudent:
 	subi $sp, $sp, WORDSIZE
-	sw $ra, 0(sp)
+	sw $ra, 0($sp)
 
 	la $a2, strQuestionFirstName
 	jal	printString
+	la $a2, arrayFirstName
+	jal returnThisStudentStringAddress
 
 	la $a2, strQuestionLastName
 	jal printString
+	la $a2, arrayLastName
+	jal returnThisStudentStringAddress
 
 	la $a2, strQuestionAge
-	jal printString
+	jal printString,
+	la $a2, arrayAge
 
 	la $a2, strQuestionYearEnrollment
 	jal printString
+	la $a2, arrayYearEnrollment
 
 	la $a2, strQuestionStudentId
 	jal printString
+	la $a2, arrayStudentId
 
 	lw $a2, indexLastStudent
 	jal incrementCounter
@@ -61,18 +68,32 @@ insertNewStudent:
 
 	jr $ra
 
-# $a2: indexLastStudent
-calcolateOffset20String:
-	mul $v1, $a2, STRINGLENGTH
+# $a2: indirizzoArrayString
+returnThisStudentStringAddress:
+	subi $sp, $sp, WORDSIZE
+	sw $ra, 0($sp)
+	
+	la $t0, indexLastStudent
+	lw $t1, 0($t0)				# indexLastStudent
+	
+	mul $t2, $t1, STRINGLENGTH	# indexLastStudent * 20 = OFFSET
+	addi $t3, $a2, $v1			# indirizzo stringa + OFFSET = indirizzo che vogliamo
+	
+	move $v1, $t3
+	
+	lw $ra, 0($sp)
+	addi $sp, $sp, WORDSIZE
+	
 	jr $ra
 
 # $a2: indirizzoWordDaIncrementare
+# $v1: valoreWordIncrementato
 incrementCounter:
-	la $t0, $a2
+	move $t0, $a2
 	lw $t1, 0($t0)
 	addi $t1, $t1, 1
+	sw $t1, 0($t0)
 	move $v1, $t1
-	sw $v1, 0($t0)
 	jr $ra
 
 # $a2: indirizzo stringa da printare
@@ -82,17 +103,22 @@ printString:
 	syscall
 	jr $ra
 
-# $a2: indirizzo stringa nella ram da scriverci su
-readString20char:
+# $a2: indirizzo stringa
+# $v1: stringa input ottenuta
+getInputString:
 	li $v0, 8
+	
 	move $a0, $a2
-	move $a1, STRINGLENGTH
+	li $a1, STRINGLENGTH
+	
 	syscall
+	
 	move $v1, $v0
 	jr $ra
 
 # $a2: indirizzo integer
-readInteger:
+# $v1: integer input ottenuta
+getInputInteger:
 	li $v0, 5
 	move $a0, $a2
 	syscall
