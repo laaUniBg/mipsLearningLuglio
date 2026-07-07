@@ -27,7 +27,7 @@
 	strQuestionYearEnrollment: 	.asciiz "scrivi anno di iscrizione: "
 	strQuestionStudentId: 		.asciiz "scrivi l'id dello studente: "
 	strNewLine: 				.asciiz "\n"
-	strAnswerGenericInput: 	.asciiz "il valore di input è: "
+	strAnswerGenericInput: 		.asciiz "il valore di input è: "
 .text
 .globl main
 
@@ -150,6 +150,9 @@ printGenericAnswerString:
 	
 	move $t0, $a2
 	
+	# la $a2, strNewLine
+	# jal printString
+	
 	la $a2, strAnswerGenericInput
 	jal printString
 	
@@ -157,6 +160,9 @@ printGenericAnswerString:
 	move $a2, $t0
 	move $a0, $a2
 	syscall
+	
+	la $a2, strNewLine
+	jal printString
 	
 	lw $ra, 0($sp)
 	addi $sp, $sp, WORDSIZE
@@ -170,6 +176,9 @@ printGenericAnswerIntegerValue:
 	
 	move $t0, $a2
 	
+	# la $a2, strNewLine
+	# jal printString
+	
 	la $a2, strAnswerGenericInput
 	jal printString
 	
@@ -178,6 +187,11 @@ printGenericAnswerIntegerValue:
 	li $v0, 1
 	move $a0, $a2
 	syscall
+	
+	la $a2, strNewLine
+	jal printString
+	la $a2, strNewLine
+	jal printString
 	
 	lw $ra, 0($sp)
 	addi $sp, $sp, WORDSIZE
@@ -195,16 +209,8 @@ getInputString:
 	li $a1, STRINGLENGTH
 	syscall
 	
-	move $t0, $a2
-	la $a2, strNewLine
-	jal printString
-	
-	move $a2, $t0
 	move $v1, $a2
 	jal printGenericAnswerString
-	
-	la $a2, strNewLine
-	jal printString
 	
 	lw $ra, 0($sp)
 	addi $sp, $sp, WORDSIZE
@@ -220,17 +226,10 @@ getInputInteger:
 	li $v0, 5
 	syscall
 	sw $v0, 0($a2)
+	move $v1, $v0
 	
-	move $t0, $v0
-	la $a2, strNewLine
-	jal printString
-	
-	move $v1, $t0	
 	move $a2, $v1
 	jal printGenericAnswerIntegerValue
-	
-	la $a2, strNewLine
-	jal printString
 	
 	lw $ra, 0($sp)
 	addi $sp, $sp, WORDSIZE
