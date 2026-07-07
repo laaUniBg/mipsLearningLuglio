@@ -2,7 +2,6 @@
 .eqv STRINGLENGTH 20
 
 .data
-	# STUDENT DATA
 	arrayStudentId:			.space 200  	# 50 studenti, 4 byte (word)
 	arrayAge: 				.space 200  
 	arrayYearEnrollment:  	.space 200
@@ -19,11 +18,11 @@
 	arrayExamNames: 		.space 20000 	# 50 studenti, 20 esami, 19 char
 
 	indexLastStudent: 		.word 0
-
+	
 	# STUDENT QUESTION STRINGS
 	strQuestionFirstName:		.asciiz "scrivi nome studente: "
 	strQuestionLastName:		.asciiz "scrivi cognome studente: "
-	strQuestionAge: 			.asciiz "scrivi l'eta  studente: "
+	strQuestionAge: 			.asciiz "scrivi l'eta studente: "
 	strQuestionYearEnrollment: 	.asciiz "scrivi anno di iscrizione: "
 	strQuestionStudentId: 		.asciiz "scrivi l'id dello studente: "
 	strNewLine: 				.asciiz "\n"
@@ -34,7 +33,6 @@
 main:
 	jal insertNewStudent
 	j finishProgram
-
 
 insertNewStudent:
 	subi $sp, $sp, WORDSIZE
@@ -49,7 +47,6 @@ insertNewStudent:
 	
 	move $a2, $v1
 	jal getInputString
-	
 	
 	# cognome
 	la $a2, strQuestionLastName
@@ -150,9 +147,6 @@ printGenericAnswerString:
 	
 	move $t0, $a2
 	
-	# la $a2, strNewLine
-	# jal printString
-	
 	la $a2, strAnswerGenericInput
 	jal printString
 	
@@ -175,9 +169,6 @@ printGenericAnswerIntegerValue:
 	sw $ra, 0($sp)
 	
 	move $t0, $a2
-	
-	# la $a2, strNewLine
-	# jal printString
 	
 	la $a2, strAnswerGenericInput
 	jal printString
@@ -236,6 +227,7 @@ getInputInteger:
 	
 	jr $ra
 
+# TODO: insertNewStudent
 finishProgram:
 	li $v0, 10
 	syscall
