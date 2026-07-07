@@ -1,8 +1,6 @@
 .data
 	promptMessage: 	.asciiz "enter a number to find its factorial: "
 	resultMessage: 	.asciiz "\nThe factorial of the number is: "
-	inputNumber: 	.word 	0
-	outputNumber:	.word	0
 	
 .text
 .globl main
@@ -16,15 +14,9 @@ main:
 	
 	jal getInputFromUser
 	
-	# input $a1: inputNumber	(n)
-	# output $v1: outputNumber 	(answer)
-	la $t0, inputNumber
-	
-	lw $a1, 0($t0)
+	# call first time with $a1 = n
+	move $a1, $v1
 	jal findFactorial
-	
-	la $t0, outputNumber
-	sw $v1, 0($t0)
 	
 	la $a1, resultMessage
 	jal writeString
@@ -35,19 +27,23 @@ main:
 	j finishProgram
 
 findFactorial:
+	# save to stack $ra, $s0
+	# $s0 is n
 	addi $sp, $sp, -8
 	sw $ra, 0($sp)
 	sw $s0, 4($sp)
 	
-	li $v1, 1
-	# base case
-	beq $a1, $zero, factorialDone   # if (n == 0) return 1
+	beq $a1, $zero, casoBase  # if (n == 0) return 1
 	
-	move $s0, $a1 # prendi argomento e lo salvi in $s0
-	sub $a1, $a1, 1 # n-1 e lo passo come parametro
+	move $s0, $a1 # n di stack = n argomento
+	sub $a1, $a1, 1 # passo come argomento n-1
 	jal findFactorial
 
-	mul $v1, $s0, $v1 # return v*fact
+	mul $v1, $s0, $v1 # factReturn = n*factReturn
+	j factorialDone
+
+casoBase:
+	li $v1, 1
 
 factorialDone:
 	lw $ra, 0($sp)
