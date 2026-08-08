@@ -2,7 +2,7 @@
 	.eqv STRINGLENGTH 20
 
 .data
-	arrayStudentId:            .space 300 # 50 studenti, 4 byte (word)
+	arrayStudentId:            .space 200 # 50 studenti, 4 byte (word)
 	arrayAge:                  .space 200
 	arrayYearEnrollment:       .space 200
 	arrayNumberPassedExams:    .space 200
@@ -22,11 +22,11 @@
 # STUDENT QUESTION STRINGS
 	strQuestionFirstName:      .asciiz "scrivi nome studente: "
 	strQuestionLastName:       .asciiz "scrivi cognome studente: "
-	strQuestionAge:            .asciiz "scrivi l'eta�studente: "
+	strQuestionAge:            .asciiz "scrivi l'eta studente: "
 	strQuestionYearEnrollment: .asciiz "scrivi anno di iscrizione: "
 	strQuestionStudentId:      .asciiz "scrivi l'id dello studente: "
 	strNewLine:                .asciiz "\n"
-	strAnswerGenericInput:     .asciiz "il valore di input �: "
+	strAnswerGenericInput:     .asciiz "il valore di input: "
 .text
 	.globl main
 
