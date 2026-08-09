@@ -1,6 +1,7 @@
 .data
 
 .text
+.globl initEmptyArrayOfSize
 
 ############
 # @procedure initEmptyArrayOfSize
@@ -14,3 +15,4 @@ initEmptyArrayOfSize:
     mul $t0, $a0, $a1
     li $a0, $t0
     syscall
+    jr $ra
