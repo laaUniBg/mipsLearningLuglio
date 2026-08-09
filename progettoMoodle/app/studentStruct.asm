@@ -1,17 +1,30 @@
-.eqv SIZE_INT 4	
-.eqv SIZE_STRING 20 # multiplo di 4, evito problema allineamento
-.eqv SIZE_BOOLEAN 4 # 1 byte basta e avanza però per praticità uso 4 come un int per evitare problemi sull'allineamento
+.eqv SIZE_INT      4
+.eqv SIZE_STRING   20
+.eqv SIZE_BOOLEAN  4
+
+.eqv OFFSET_EXAM_CREDITS            0
+.eqv OFFSET_EXAM_GRADE              SIZE_INT + OFFSET_EXAM_CREDITS 
+.eqv OFFSET_EXAM_NAME               SIZE_INT + OFFSET_EXAM_GRADE
+
+.eqv OFFSET_STUD_ACTIVE             0
+.eqv OFFSET_STUD_ID                 SIZE_BOOLEAN + OFFSET_STUD_ACTIVE 
+.eqv OFFSET_STUD_AGE                SIZE_INT     + OFFSET_STUD_ID
+.eqv OFFSET_STUD_YEAR               SIZE_INT     + OFFSET_STUD_AGE
+.eqv OFFSET_STUD_FIRSTNAME          SIZE_INT     + OFFSET_STUD_YEAR 
+.eqv OFFSET_STUD_LASTNAME           SIZE_STRING  + OFFSET_STUD_FIRSTNAME 
+.eqv OFFSET_STUD_NUM_PASSED_EXAMS   SIZE_STRING  + OFFSET_STUD_LASTNAME
+.eqv OFFSET_STUD_EXAMS_ARRAY        SIZE_INT     + OFFSET_STUD_NUM_EXAMS 
+
+.eqv MAX_EXAMS_EACH_STUDENT         20
+.eqv MAX_STUDENTS_IN_ARRAY          50
+
+.eqv SIZE_EXAM_STRUCT               SIZE_STRING + OFFSET_EXAM_NAME
+.eqv SIZE_EXAMS_ARRAY               MAX_EXAMS_EACH_STUDENT * SIZE_EXAM_STRUCT
+
+.eqv SIZE_STUDENT_STRUCT            OFFSET_STUD_EXAMS + SIZE_EXAMS_ARRAY
+.eqv SIZE_STUDENTS_ARRAY            SIZE_STUDENT_STRUCT * MAX_STUDENTS_IN_ARRAY
 
 .data
-    studentStruct:
-        SIZE_BOOLEAN, # isActive
-        SIZE_INT, #id
-        SIZE_INT, #age
-        SIZE_INT, #yearEnrollment
-        SIZE_STRING, #firstName
-        SIZE_STRING, #lastName
-        SIZE_INT, #numberPassedExams
-
-    
+    arrayStudenti: .space SIZE_STUDENTS_ARRAY
 .text
 
