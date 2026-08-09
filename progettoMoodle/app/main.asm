@@ -32,11 +32,11 @@
 #     lw $a0, 0($t0)
 #     syscall
 
-.eqv A 4
-.eqv B 5
+.eqv A     4
+.eqv VALB  5
 
 .data
-    testWord: .word B
+    testWord: .word VALB
 .text
     li $v0, 1
     la $t0, testWord
