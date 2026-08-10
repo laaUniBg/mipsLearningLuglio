@@ -26,7 +26,7 @@
 	.globl main
 
 main:
-	li $a0, 5
+	li $a1, 5
 	jal returnAddressStudentByIndex
 	li $v0, 1
 	move $a0, $v1
@@ -38,7 +38,7 @@ main:
 # @returns  {addr}  $v1 - offsetThisStudent (absolute con riferimento ram)
 # @modifies $t0, $t1
 returnAddressStudentByIndex:
-	mul $t0, $a0, SIZE_STUDENT_STRUCT    # offsetThisStudente (relative)
+	mul $t0, $a1, SIZE_STUDENT_STRUCT    # offsetThisStudente (relative)
 	la $t1, studentStructsArray          # inizio posizione ram array studenti
 	add $v1, $t0, $t1                    # offsetThisStudent (absolute)
 
