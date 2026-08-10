@@ -4,13 +4,13 @@
 .text
 .globl searchInKeyValueMap
 
-.macro stackSave reg
+.macro stackPreserveStart(%registerToSave)
     addi $sp, $sp, -4
-    sw \reg, 0($sp)
+    sw %registerToSave, 0($sp)
 .end_macro
 
-.macro stackLoad reg
-    lw \reg, 0($sp)
+.macro stackPreserveEnd(%registerToLoad)
+    lw %registerToLoad, 0($sp)
     addi $sp, $sp, 4
 .end_macro
 
@@ -26,9 +26,7 @@
 
 searchInKeyValueMap:
     # salvo $ra per poter chiamare le funzioni dentro le funzioni
-    addi $sp, $sp, -4
-    sw $ra, 0($sp)
-
+    stackPreserveStart($ra)
 	la $t0, $a2    # indirizzo inizio map
 
 searchLoop:
@@ -42,9 +40,7 @@ searchLoop:
 isFoundLogic:
 	lw $t3, 4($t0)    # indirizzoValueString
 
-	addi $sp, $sp, -4
-	sw $a1, 0($sp)
-
+	stackPreserveStart($a1)
 startPrintingIsFound:
 	move $a1, strMsgFoundValue
 	jal printStringFromAddress
@@ -56,11 +52,8 @@ startPrintingIsFound:
 	jal printStringFromAddress
 
 endPrintingIsFound:
-	lw $a1, 0($sp)
-	addi $sp, $sp, 4
-
+	stackPreserveEnd($a1)
 	move $v1, $t3 	# return $v1
-
 	j finallyLogic
 # --
 
@@ -76,6 +69,7 @@ isStillSearchingLogic:
     j finallyLogic
 
 finallyLogic:
+	stackPreserveEnd($ra)
     lw $ra, 0($sp)
     addi $sp, $sp, 4
 
