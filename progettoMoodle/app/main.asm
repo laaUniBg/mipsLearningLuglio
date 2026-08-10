@@ -1,77 +1,47 @@
-.eqv SIZE_INT      4
-.eqv SIZE_STRING   20
-.eqv SIZE_BOOLEAN  4
+	.eqv MAX_EXAMS_EACH_STUDENT 20
+	.eqv MAX_STUDENTS_IN_ARRAY 50
 
-.eqv OFFSET_EXAM_CREDITS            0
-.eqv OFFSET_EXAM_GRADE              SIZE_INT        + OFFSET_EXAM_CREDITS 
-.eqv OFFSET_EXAM_NAME               SIZE_INT        + OFFSET_EXAM_GRADE
-.eqv SIZE_EXAM_STRUCT               SIZE_STRING     + OFFSET_EXAM_NAME
+	.eqv OFFSET_STUD_ACTIVE 0
+	.eqv OFFSET_STUD_ID 4
+	.eqv OFFSET_STUD_AGE 8
+	.eqv OFFSET_STUD_YEAR 12
+	.eqv OFFSET_STUD_FIRSTNAME 16
+	.eqv OFFSET_STUD_LASTNAME 36
+	.eqv OFFSET_STUD_NUM_PASSED_EXAMS 56
+	.eqv OFFSET_STUD_EXAMS_ARRAY 60
 
-.eqv OFFSET_STUD_ACTIVE             0
-.eqv OFFSET_STUD_ID                 SIZE_BOOLEAN    + OFFSET_STUD_ACTIVE 
-.eqv OFFSET_STUD_AGE                SIZE_INT        + OFFSET_STUD_ID
-.eqv OFFSET_STUD_YEAR               SIZE_INT        + OFFSET_STUD_AGE
-.eqv OFFSET_STUD_FIRSTNAME          SIZE_INT        + OFFSET_STUD_YEAR 
-.eqv OFFSET_STUD_LASTNAME           SIZE_STRING     + OFFSET_STUD_FIRSTNAME 
-.eqv OFFSET_STUD_NUM_PASSED_EXAMS   SIZE_STRING     + OFFSET_STUD_LASTNAME
-.eqv OFFSET_STUD_EXAMS_ARRAY        SIZE_INT        + OFFSET_STUD_NUM_PASSED_EXAMS
+	.eqv OFFSET_EXAM_CREDITS 0
+	.eqv OFFSET_EXAM_GRADE 4
+	.eqv OFFSET_EXAM_NAME 8
+	.eqv SIZE_EXAM_STRUCT 28
 
-.eqv MAX_EXAMS_EACH_STUDENT         20
-.eqv SIZE_EXAMS_ARRAY               MAX_EXAMS_EACH_STUDENT  * SIZE_EXAM_STRUCT
-.eqv SIZE_STUDENT_STRUCT            SIZE_EXAMS_ARRAY        + OFFSET_STUD_EXAMS_ARRAY
-
-.eqv MAX_STUDENTS_IN_ARRAY          50
-.eqv SIZE_STUDENTS_ARRAY            SIZE_STUDENT_STRUCT     * MAX_STUDENTS_IN_ARRAY
+	.eqv SIZE_EXAMS_ARRAY 560 # 20*28
+	.eqv SIZE_STUDENT_STRUCT 620 # 560+60
+	.eqv SIZE_STUDENTS_ARRAY 31000 # 620*50
 
 .data
+	studentStructsArray: .space SIZE_STUDENTS_ARRAY
 
 .text
+	.globl main
 
+main:
+	li $a0, 5
+	jal returnAddressStudentByIndex
+	li $v0, 1
+	move $a0, $v1
+	syscall
 
+	j finishProgram
 
-############
-# @procedure initEmptyArrayOfSize
-#   @param    {int}       $a0 - byteForEveryElement
-#   @param    {int}       $a1 - sizeArray
-#   @returns  {any[]}     $v0 - indirizzoArrayDinamico 
-#   @modifies {$t0}           - 
-############
-initEmptyArrayOfSize:
-    li $v0, 9
-    mul $t0, $a0, $a1
-    li $a0, $t0
-    syscall
-    jr $ra
+# @arg      {int}   $a1 - indexStudent (valore a 0 a 49)
+# @returns  {addr}  $v1 - offsetThisStudent (absolute con riferimento ram)
+# @modifies $t0, $t1
+returnAddressStudentByIndex:
+	mul $t0, $a0, SIZE_STUDENT_STRUCT    # offsetThisStudente (relative)
+	la $t1, studentStructsArray          # inizio posizione ram array studenti
+	add $v1, $t0, $t1                    # offsetThisStudent (absolute)
 
-
-# .eqv OFFSET_EXAM_CREDITS            0
-# .eqv OFFSET_EXAM_GRADE              SIZE_INT        + OFFSET_EXAM_CREDITS 
-# .eqv OFFSET_EXAM_NAME               SIZE_INT        + OFFSET_EXAM_GRADE
-# .eqv SIZE_EXAM_STRUCT               SIZE_STRING     + OFFSET_EXAM_NAME
-
-# .eqv OFFSET_STUD_ACTIVE             0
-# .eqv OFFSET_STUD_ID                 SIZE_BOOLEAN    + OFFSET_STUD_ACTIVE 
-# .eqv OFFSET_STUD_AGE                SIZE_INT        + OFFSET_STUD_ID
-# .eqv OFFSET_STUD_YEAR               SIZE_INT        + OFFSET_STUD_AGE
-# .eqv OFFSET_STUD_FIRSTNAME          SIZE_INT        + OFFSET_STUD_YEAR 
-# .eqv OFFSET_STUD_LASTNAME           SIZE_STRING     + OFFSET_STUD_FIRSTNAME 
-# .eqv OFFSET_STUD_NUM_PASSED_EXAMS   SIZE_STRING     + OFFSET_STUD_LASTNAME
-# .eqv OFFSET_STUD_EXAMS_ARRAY        SIZE_INT        + OFFSET_STUD_NUM_PASSED_EXAMS
-
-# .eqv MAX_EXAMS_EACH_STUDENT         20
-# .eqv SIZE_EXAMS_ARRAY               MAX_EXAMS_EACH_STUDENT  * SIZE_EXAM_STRUCT
-# .eqv SIZE_STUDENT_STRUCT            SIZE_EXAMS_ARRAY        + OFFSET_STUD_EXAMS_ARRAY
-
-# .eqv MAX_STUDENTS_IN_ARRAY          50
-# .eqv SIZE_STUDENTS_ARRAY            SIZE_STUDENT_STRUCT     * MAX_STUDENTS_IN_ARRAY
-
-# .data
-    
-#     sizeStudenti: .word SIZE_STUDENTS_ARRAY
-# .text
-
-
-#     li $v0, 1
-#     la $t0, sizeStudenti
-#     lw $a0, 0($t0)
-#     syscall
+finishProgram:
+	li $v0, 10
+	syscall
