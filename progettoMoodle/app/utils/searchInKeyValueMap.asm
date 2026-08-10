@@ -4,15 +4,7 @@
 .text
 .globl searchInKeyValueMap
 
-.macro stackPreserveStart(%registerToSave)
-    addi $sp, $sp, -4
-    sw %registerToSave, 0($sp)
-.end_macro
 
-.macro stackPreserveEnd(%registerToLoad)
-    lw %registerToLoad, 0($sp)
-    addi $sp, $sp, 4
-.end_macro
 
 # ---- INIZIO searchInKeyValueMap
 # @arg      {int}           $a1 - thisKey
