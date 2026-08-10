@@ -4,6 +4,16 @@
 .text
 .globl searchInKeyValueMap
 
+.macro stackSave reg
+    addi $sp, $sp, -4
+    sw \reg, 0($sp)
+.end_macro
+
+.macro stackLoad reg
+    lw \reg, 0($sp)
+    addi $sp, $sp, 4
+.end_macro
+
 # ---- INIZIO searchInKeyValueMap
 # @arg      {int}           $a1 - thisKey
 # @arg      {addr|int}      $a2 - thisMap (solo .word maps {key: int, value: addr} -> il value è indirizzo di una stringa .asciiz)
