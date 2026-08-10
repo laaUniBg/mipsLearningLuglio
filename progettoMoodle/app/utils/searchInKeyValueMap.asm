@@ -27,7 +27,7 @@
 searchInKeyValueMap:
     # salvo $ra per poter chiamare le funzioni dentro le funzioni
     stackPreserveStart($ra)
-	la $t0, $a2    # indirizzo inizio map
+	move $t0, $a2    # indirizzo inizio map
 
 searchLoop:
 	lw $t1, 0($t0)                      # thisKey
@@ -70,8 +70,6 @@ isStillSearchingLogic:
 
 finallyLogic:
 	stackPreserveEnd($ra)
-    lw $ra, 0($sp)
-    addi $sp, $sp, 4
 
 	jr $ra
 # ---- FINE searchInKeyValueMap
