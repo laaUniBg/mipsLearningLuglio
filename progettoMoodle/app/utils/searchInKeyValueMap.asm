@@ -4,7 +4,7 @@
 .text
 .globl searchInKeyValueMap
 
-# INIZIO searchInKeyValueMap
+# ---- INIZIO searchInKeyValueMap
 # @arg      {int}           $a1 - thisKey
 # @arg      {addr|int}      $a2 - thisMap (solo .word maps {key: int, value: addr} -> il value è indirizzo di una stringa .asciiz)
 # @returns  {addr.string}	$v1 - thisValue (addr.string)
@@ -28,12 +28,14 @@ searchLoop:
 	beq $t2, TRUE, isFoundLogic    		# if(isFound)
 	beq $t2, FALSE, isNotFoundLogic     # if(!isFound)
 
+# -- 
 isFoundLogic:
 	lw $t3, 4($t0)    # indirizzoValueString
 
 	addi $sp, $sp, -4
 	sw $a1, 0($sp)
 
+startPrintingIsFound:
 	move $a1, strMsgFoundValue
 	jal printStringFromAddress
 
@@ -43,22 +45,24 @@ isFoundLogic:
 	move $a1, strNewLine
 	jal printStringFromAddress
 
+endPrintingIsFound:
 	lw $a1, 0($sp)
 	addi $sp, $sp, 4
 
 	move $v1, $t3 	# return $v1
 
 	j finallyLogic
+# --
 
 isNotFoundLogic:
     seq $t4, $t1, NOT_FOUND # hasSearchedAll
     beq $t4, TRUE, hasSearchedAllLogic
-	beq $t4, FALSE, hasNotSearchedAllLogic
+	beq $t4, FALSE, isStillSearchingLogic
 
 hasSearchedAllLogic:
     j finallyLogic
 
-hasNotSeachedAllLogic:
+isStillSearchingLogic:
     j finallyLogic
 
 finallyLogic:
@@ -66,4 +70,4 @@ finallyLogic:
     addi $sp, $sp, 4
 
 	jr $ra
-# FINE searchInKeyValueMap
+# ---- FINE searchInKeyValueMap
