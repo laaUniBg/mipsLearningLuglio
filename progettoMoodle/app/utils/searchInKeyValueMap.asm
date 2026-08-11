@@ -7,13 +7,13 @@
 
 
 # ---- INIZIO searchInKeyValueMap
-# @arg      {int}           $a1 - thisKey
-# @arg      {addr|int}      $a2 - thisMap (solo .word maps {key: int, value: addr} -> il value è indirizzo di una stringa .asciiz)
+# @arg      {int}           $a1 - wantedKey
+# @arg      {addr|int}      $a2 - thisMap (solo .word maps {key: int, value: addr|int} -> il value è indirizzo di una stringa .asciiz oppure qualsiasi type di 4byte come int)
 # @returns  {addr.string}	$v1 - thisValue (addr.string)
 # @modifies {addr}          $t0 - indirizzo inizio mappa
 # @modifies {int}           $t1 - thisKey
 # @modifies {bool: 0|1}     $t2 - isFound
-# @modifies {addr.string}   $t3 - indirizzoValueString
+# @modifies {addr.string}   $t3 - hasSearchedAll (ovvero thisKey == -1)
 # @modifies {bool: 0|1}     $t4 - hasSearchedAllLogic
 
 searchInKeyValueMap:
@@ -21,47 +21,58 @@ searchInKeyValueMap:
     stackPreserveStart($ra)
 	move $t0, $a2    # indirizzo inizio map
 
-searchLoop:
-	lw $t1, 0($t0)                      # thisKey
-	seq $t2, $t1, $a1                   # isFound
+	searchLoop:
+		lw $t1, 0($t0)                      # thisKey
+		seq $t2, $t1, $a1					# isKeyFound -> thisKey == wantedKey ? 1 : 0;
+		beq $t2, TRUE, isKeyFoundLogic		# if(isKeyFound) goto isKeyFoundLogic;
+			isKeyNotFoundLogic:
+				seq $t3, $t1, NOT_FOUND		# hasSearchedAll -> thisKey == -1 ? 1 : 0
+				beq $t3, TRUE, hasSearchedAllWithoutFindingKeyLogic
+					stillSearchingKeyLogic:
 
-	beq $t2, TRUE, isFoundLogic    		# if(isFound)
-	beq $t2, FALSE, isNotFoundLogic     # if(!isFound)
+				hasSearchedAllWithoutFindingKeyLogic:
 
-# -- 
-isFoundLogic:
-	lw $t3, 4($t0)    # indirizzoValueString
+			isKeyFoundLogic:
 
-	stackPreserveStart($a1)
-startPrintingIsFound:
-	move $a1, strMsgFoundValue
-	jal printStringFromAddress
 
-    move $a1, $t3
-    jal printStringFromAddress
+	# seq $t2, $t1, $a1                   # isFound
+	# beq $t2, TRUE, isKeyFoundLogic    		# if(isFound)
+	# beq $t2, FALSE, isNotFoundLogic     # if(!isFound)
 
-	move $a1, strNewLine
-	jal printStringFromAddress
+# # -- 
+# isKeyFoundLogic:
+# 	lw $t3, 4($t0)    # indirizzoValueString
 
-endPrintingIsFound:
-	stackPreserveEnd($a1)
-	move $v1, $t3 	# return $v1
-	j finallyLogic
-# --
+# 	stackPreserveStart($a1)
+# startPrintingIsFound:
+# 	move $a1, strMsgFoundValue
+# 	jal printStringFromAddress
 
-isNotFoundLogic:
-    seq $t4, $t1, NOT_FOUND # hasSearchedAll
-    beq $t4, TRUE, hasSearchedAllLogic
-	beq $t4, FALSE, isStillSearchingLogic
+#     move $a1, $t3
+#     jal printStringFromAddress
 
-hasSearchedAllLogic:
-    j finallyLogic
+# 	move $a1, strNewLine
+# 	jal printStringFromAddress
 
-isStillSearchingLogic:
-    j finallyLogic
+# endPrintingIsFound:
+# 	stackPreserveEnd($a1)
+# 	move $v1, $t3 	# return $v1
+# 	j finallyLogic
+# # --
 
-finallyLogic:
-	stackPreserveEnd($ra)
+# isNotFoundLogic:
+#     seq $t4, $t1, NOT_FOUND # hasSearchedAll
+#     beq $t4, TRUE, hasSearchedAllLogic
+# 	beq $t4, FALSE, isStillSearchingLogic
 
-	jr $ra
-# ---- FINE searchInKeyValueMap
+# hasSearchedAllLogic:
+#     j finallyLogic
+
+# isStillSearchingLogic:
+#     j finallyLogic
+
+# finallyLogic:
+# 	stackPreserveEnd($ra)
+
+# 	jr $ra
+# # ---- FINE searchInKeyValueMap
