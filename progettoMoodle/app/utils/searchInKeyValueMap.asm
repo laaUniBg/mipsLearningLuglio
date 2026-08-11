@@ -18,7 +18,7 @@ searchInKeyValueMap:
     stackPreserveStart($ra)
 	move $t0, $a2    # indirizzo inizio map
 
-	searchLoop:
+	innerSearchLoop:
 		lw $t1, 0($t0)                      # thisKey (non indirizzo ma valore)
 		seq $t2, $t1, $a1					# isKeyFound -> thisKey == wantedKey ? 1 : 0;
 		beq $t2, TRUE, isKeyFoundLogic		# if(isKeyFound) goto isKeyFoundLogic;
@@ -27,7 +27,7 @@ searchInKeyValueMap:
 				beq $t3, TRUE, hasSearchedAllWithoutFindingKeyLogic
 					stillSearchingKeyLogic:
 						addi $t0, $t0, 8	# salto al prossimo thisKey
-						j searchLoop
+						j innerSearchLoop
 
 					hasSearchedAllWithoutFindingKeyLogic:
 						# TODO: il codice sotto di commento serve per il debugging
