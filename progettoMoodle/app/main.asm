@@ -26,25 +26,26 @@
 	.globl main
 
 main:
-	li $a1, 20
-	jal returnAddressStudentByIndex
-	li $v0, 1
-	move $a0, $v1
-	syscall
-
 	j finishProgram
+# 	li $a1, 20
+# 	jal returnAddressStudentByIndex
+# 	li $v0, 1
+# 	move $a0, $v1
+# 	syscall
 
-# @arg      {int}   $a1 - indexStudent (valore a 0 a 49)
-# @returns  {addr}  $v1 - offsetThisStudent (absolute con riferimento ram)
-# @modifies $t0, $t1
-returnAddressStudentByIndex:
-	mul $t0, $a1, SIZE_STUDENT_STRUCT    # offsetThisStudente (relative)
-	la $t1, studentStructsArray          # inizio posizione ram array studenti
-	add $v1, $t0, $t1                    # offsetThisStudent (absolute)
-    jr $ra
+# 	j finishProgram
 
-# @arg {int} $a1 - numeroCodiceErrore
-throwError:
+# # @arg      {int}   $a1 - indexStudent (valore a 0 a 49)
+# # @returns  {addr}  $v1 - offsetThisStudent (absolute con riferimento ram)
+# # @modifies $t0, $t1
+# returnAddressStudentByIndex:
+# 	mul $t0, $a1, SIZE_STUDENT_STRUCT    # offsetThisStudente (relative)
+# 	la $t1, studentStructsArray          # inizio posizione ram array studenti
+# 	add $v1, $t0, $t1                    # offsetThisStudent (absolute)
+#     jr $ra
+
+# # @arg {int} $a1 - numeroCodiceErrore
+# throwError:
 
 
 finishProgram:

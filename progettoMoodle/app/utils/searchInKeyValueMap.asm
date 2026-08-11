@@ -1,5 +1,9 @@
+.eqv TRUE       1
+.eqv FALSE      0
+.eqv NOT_FOUND  -1
+
 .data
-	strErrorExceptionNotFound: "[EXCEPTION]: thisKey not found... ricordati di usare beq $v1, -1, handleCostumNotFoundException"
+	strErrorExceptionNotFound: .asciiz "[EXCEPTION]: thisKey not found... ricordati di usare beq $v1, -1, handleCostumNotFoundException"
 .text
 .globl searchInKeyValueMap
 
