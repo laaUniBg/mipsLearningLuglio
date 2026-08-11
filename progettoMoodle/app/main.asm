@@ -28,7 +28,19 @@
 main:
 	j finishProgram
 
+# @arg {int} $a1 - wantedIndex
+# @arg {int} $a2 - sizeOfItem
+# @arg {addr.array} $a3 - arrayAddress
+# @returns {addr.any} $v1 - addressAtIndex
+# @modiefies {int} $t0 - arrayOffset
+getAddressOfItemOfArrayUsingSizeAndIndex:
+	mul $t0, $a1, $a2 # arrayOffset
+	add $v1, $a3, $t0 # return addressAtIndex
+	jr $ra
 
+getAddressOfStudentUsingIndex:
+	# TODO: usa parametri con studentStructArray e cosi via (usa 'la' per prendere indirizzo... ricordati di salvare $ra sw e lw)
+	jal getAddressOfItemOfArrayUsingSizeAndIndex
 
 
 # 	li $a1, 20
