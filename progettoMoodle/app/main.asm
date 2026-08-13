@@ -34,10 +34,17 @@ main:
 
 # @arg {addr.string} $a1 - firstString
 # @arg {addr.string} $a2 - secondString
-# @arg {int} $a3 - maxSizeString
-# @returns {bool} - isEqual
+# @returns {int} - ritorna 0 se uguale, ritorna valore negativo se alfabeticamente firstString precede secondString, ritorna valore positivo se alfabeticamente firstString succede secondString.
 strCompare:
-
+	move $t0, $a1 # firstStringCharAddress
+	move $t1, $a2 # secondStringCharAddress
+	lb $t2, 0($t0) # firstCharASCIIbyteCode
+	lb $t3, 0($t1) # secondCharASCIIbyteCode
+	beq $t2, $t3, strCompare__isCharEqualLogic
+	# TODO: ricorda anche \0 per la fine della stringa pero se entrambi finiscono con \0 significa che diamo zero come risultato... se invece non finiscono uguale ricordiamo ultimo valore. magari un buffer con ultimo risultato
+		strCompare__isCharEqualLogic:
+		# TODO:
+	jr $ra
 
 # @arg {addr.arrayOfStructs} $a0 - arrayOfStructsAddress: una mappa nel nostro caso è un array di structs ovvero un array di strutture dati ordinate. (io generalmente parto da $a1 per gli argomento per evitare di sovrascrivere syscall methods ma quindi ho bisogno di tanti argomenti quindi parto da 0... quindi ricorda che se modifichi il codice e aggiungi qualche syscall di salvarla nello stack momentaneamente per evitare bugs)
 # @arg {int} $t8 - sizeOfArrayOfStructs: serve per decidere quando fermarsi nella ricerca per ritornare il NOT_FOUND ovvero -1
@@ -96,14 +103,13 @@ getAddressOfStudentUsingIndex:
 	stackPreserveEnd($ra)
 	jr $ra
 
+# @arg {addr} $a1 - indirizzoStringaDaPrintare
+printStringFromAddress:
+    li $v0, 4
+    move $a0, $a1
+    syscall
+    jr $ra
 
-# 	li $a1, 20
-# 	jal returnAddressStudentByIndex
-# 	li $v0, 1
-# 	move $a0, $v1
-# 	syscall
-
-# 	j finishProgram
 
 # # @arg      {int}   $a1 - indexStudent (valore a 0 a 49)
 # # @returns  {addr}  $v1 - offsetThisStudent (absolute con riferimento ram)
@@ -113,9 +119,6 @@ getAddressOfStudentUsingIndex:
 # 	la $t1, studentStructsArray          # inizio posizione ram array studenti
 # 	add $v1, $t0, $t1                    # offsetThisStudent (absolute)
 #     jr $ra
-
-# # @arg {int} $a1 - numeroCodiceErrore
-# throwError:
 
 .macro stackPreserveStart(%registerToSave)
     addi $sp, $sp, -4
