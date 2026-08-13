@@ -19,6 +19,10 @@
 .eqv SIZE_STUDENT_STRUCT 620 # 560+60
 .eqv SIZE_STUDENTS_ARRAY 31000 # 620*50
 
+.eqv TRUE       1
+.eqv FALSE      0
+.eqv NOT_FOUND  -1
+
 .data
 	studentStructsArray: .space SIZE_STUDENTS_ARRAY
 
@@ -28,18 +32,42 @@
 main:
 	j finishProgram
 
-# @arg {addr.map} $a0 - mapAddress: una mappa nel nostro caso è un array di structs ovvero un array di strutture dati ordinate. 
+# @arg {addr.arrayOfStructs} $a0 - arrayOfStructsAddress: una mappa nel nostro caso è un array di structs ovvero un array di strutture dati ordinate. (io generalmente parto da $a1 per gli argomento per evitare di sovrascrivere syscall methods ma quindi ho bisogno di tanti argomenti quindi parto da 0... quindi ricorda che se modifichi il codice e aggiungi qualche syscall di salvarla nello stack momentaneamente per evitare bugs)
+# @arg {int} $t8 - sizeOfArrayOfStructs: serve per decidere quando fermarsi nella ricerca per ritornare il NOT_FOUND ovvero -1
 # @arg {int} $a1 - sizeArrayItem
-# @arg {int} $a2 - offsetKeyInsideItem
-# @arg {bool} $a3 - isReturningfullSizeValue
-# 					-> TRUE: ritornare indirizzo dell'item completo che comprende pure il key
-#					-> FALSE: ritornare l'indirizzo dopo la fine del key (somma keyAddress+sizeAddress+arrayAddress)
-# @arg ?{-1|int} $a4 - sizeBytesKey: (opzionale se vuoi indirizzo dell'item completo... invece se vuoi dopo il key devi inserire ovviamente anche questo argomento)
-searchInKeyValueMap:
+# @arg {int} $a2 - offsetKeyInsideItem (diamo per scontato che il key sia una word ovvero un integer quindi sizeBytesOfKey = 4)
+# @arg {int} $a3 - integerToSearch (se trovato poi ritorna la posizione dell'item struct dove è presente il key)
+# @returns {addr.struct} $v1 - ritorna la posizione address dell'item dove è presente il key
+# @modifies {addr.struct} $t0 - thisItemAddress
+# @modifies {addr.int} $t1 - thisKeyAddress
+# @modifies {int} $t2 - thisKey (non indirizzo ma valore)
+# @modifies {addr.struct} $t3 - nextItemAddress (serve per il controllo prima di aggiornare $t0)
+# @modifies {addr} $t4 - maxAddressPossible
+searchInKeyIntegerValueMap:
+	move $t0, $a0 # thisItemAddress (ovviamente all'inizio combaccia con l'indirizzo dell'array)
 
-	jr $ra
+	searchInKeyIntegerValueMap__innerSearchLoop:
+		addu $t1, $t0, $a2 # thisKeyAddress (ovvero utilizzo offset studente e dentro lo struct student aggiungo offset del key)
+		lw $t2, 0($t1) # thisKey (non indirizzo ma valore)
 
+		beq $t2, $a3, searchInKeyIntegerValueMap__isKeyFoundLogic
+			searchInKeyIntegerValueMap__isStillSearchingLogic:
+				addu $t3, $t0, $a1 # nextItemAddress
+				addu $t4, $a0, $t8 # maxAddressPossible
+				bge $t3, $t4, searchInKeyIntegerValueMap__isKeyNotFoundLogic # if(nextItemAddress>sizeOfArray) allora è sicuro che non devo continuare la ricerca se no accedo a un altra variabile (quindi abbiamo controllato tutto l'array)
+				move $t0, $t3 # aggiorno thisItemAddress con nextItemAddress
+				j searchInKeyIntegerValueMap__innerSearchLoop
 
+			searchInKeyIntegerValueMap__isKeyFoundLogic:
+				move $v1, $t0
+				j searchInKeyIntegerValueMap__finallyLogic
+
+			searchInKeyIntegerValueMap__isKeyNotFoundLogic:
+				move $v1, NOT_FOUND
+				j searchInKeyIntegerValueMap__finallyLogic
+	
+	searchInKeyIntegerValueMap__finallyLogic:
+		jr $ra
 
 # @arg {int} $a1 - wantedIndex
 # @arg {int} $a2 - sizeOfItem
