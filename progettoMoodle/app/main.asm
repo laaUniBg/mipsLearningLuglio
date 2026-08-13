@@ -28,6 +28,19 @@
 main:
 	j finishProgram
 
+# @arg {addr.map} $a0 - mapAddress: una mappa nel nostro caso è un array di structs ovvero un array di strutture dati ordinate. 
+# @arg {int} $a1 - sizeArrayItem
+# @arg {int} $a2 - offsetKeyInsideItem
+# @arg {bool} $a3 - isReturningfullSizeValue
+# 					-> TRUE: ritornare indirizzo dell'item completo che comprende pure il key
+#					-> FALSE: ritornare l'indirizzo dopo la fine del key (somma keyAddress+sizeAddress+arrayAddress)
+# @arg ?{-1|int} $a4 - sizeBytesKey: (opzionale se vuoi indirizzo dell'item completo... invece se vuoi dopo il key devi inserire ovviamente anche questo argomento)
+searchInKeyValueMap:
+
+	jr $ra
+
+
+
 # @arg {int} $a1 - wantedIndex
 # @arg {int} $a2 - sizeOfItem
 # @arg {addr.array} $a3 - arrayAddress
@@ -38,9 +51,15 @@ getAddressOfItemOfArrayUsingSizeAndIndex:
 	add $v1, $a3, $t0 # return addressAtIndex
 	jr $ra
 
+# @arg {int} $a1 - wantedIndex
+# @returns {addr.array} $v1 - addressAtIndex 
 getAddressOfStudentUsingIndex:
-	# TODO: usa parametri con studentStructArray e cosi via (usa 'la' per prendere indirizzo... ricordati di salvare $ra sw e lw)
+	stackPreserveStart($ra)
+	li $a2, SIZE_STUDENT_STRUCT
+	la $a3, studentStructsArray
 	jal getAddressOfItemOfArrayUsingSizeAndIndex
+	stackPreserveEnd($ra)
+	jr $ra
 
 
 # 	li $a1, 20
@@ -63,6 +82,15 @@ getAddressOfStudentUsingIndex:
 # # @arg {int} $a1 - numeroCodiceErrore
 # throwError:
 
+.macro stackPreserveStart(%registerToSave)
+    addi $sp, $sp, -4
+    sw %registerToSave, 0($sp)
+.end_macro
+
+.macro stackPreserveEnd(%registerToLoad)
+    lw %registerToLoad, 0($sp)
+    addi $sp, $sp, 4
+.end_macro
 
 finishProgram:
 	li $v0, 10
