@@ -32,6 +32,13 @@
 main:
 	j finishProgram
 
+# @arg {addr.string} $a1 - firstString
+# @arg {addr.string} $a2 - secondString
+# @arg {int} $a3 - maxSizeString
+# @returns {bool} - isEqual
+strCompare:
+
+
 # @arg {addr.arrayOfStructs} $a0 - arrayOfStructsAddress: una mappa nel nostro caso è un array di structs ovvero un array di strutture dati ordinate. (io generalmente parto da $a1 per gli argomento per evitare di sovrascrivere syscall methods ma quindi ho bisogno di tanti argomenti quindi parto da 0... quindi ricorda che se modifichi il codice e aggiungi qualche syscall di salvarla nello stack momentaneamente per evitare bugs)
 # @arg {int} $t8 - sizeOfArrayOfStructs: serve per decidere quando fermarsi nella ricerca per ritornare il NOT_FOUND ovvero -1
 # @arg {int} $a1 - sizeArrayItem
