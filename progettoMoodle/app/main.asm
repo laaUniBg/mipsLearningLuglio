@@ -50,31 +50,48 @@ strCompare:
 		lb $t2, 0($t0) # thisChar ASCIIbyteCode FirstString
 		lb $t3, 0($t1) # thisChar ASCIIbyteCode SecondString
 
+		seq $t4, $t2, $zero # isFirstStringFinished
+		seq $t5, $t3, $zero # isSecondStringFinished
+
+		and $t6, $t4, $t5  # isBothStringsFinished
+		or $t7, $t4, $t5 # isAtLeastOneStringFinished
+
+		and $t8
+
+
+		beq $t6, FALSE, strCompare__stillLoopingLogic # 
+			strCompare__stillLoopingLogic:
+				addi $t0, $t0, 1 # firstString nextChar address
+				addi $t1, $t1, 1 # secondString nextChar address
+				j strCompare__innerLoop
+
 		beq $t2, $t3, strCompare__isCharEqualLogic
 			strCompare__isCharNotEqualLogic:
-				beq $t2, $zero, strCompare__firstStringSetCharToPrevious
-					strCompare__firstStringSetCharToCurrent:
-						lb $t4, 0($t0)
-						j strCompare__firstStringSetCharFinally
+				sub $v1, $t2, $t3
+				j finallyLogic
+				# beq $t2, $zero, strCompare__firstStringSetCharToPrevious
+				# 	strCompare__firstStringSetCharToCurrent:
+				# 		lb $t4, 0($t0)
+				# 		j strCompare__firstStringSetCharFinally
 
-					strCompare__firstStringSetCharToPrevious:
-						lb $t4, -1($t0) # il carattere prima di \0 cosi non facciamo sottrazione con \0
-						j strCompare__firstStringSetCharFinally
+				# 	strCompare__firstStringSetCharToPrevious:
+				# 		lb $t4, -1($t0) # il carattere prima di \0 cosi non facciamo sottrazione con \0
+				# 		j strCompare__firstStringSetCharFinally
 
-					strCompare__firstStringSetCharFinally:
-						beq $t3, $zero, strCompare__secondStringSetCharToPrevious
-							strCompare__secondStringSetCharToCurrent:
-								lb $t5, 0($t1)
-								j strCompare__secondStringSetCharFinally
+				# 	strCompare__firstStringSetCharFinally:
+				# 		beq $t3, $zero, strCompare__secondStringSetCharToPrevious
+				# 			strCompare__secondStringSetCharToCurrent:
+				# 				lb $t5, 0($t1)
+				# 				j strCompare__secondStringSetCharFinally
 
-							strCompare__secondStringSetCharToPrevious:
-								lb $t5, -1($t1)
-								j strCompare__secondStringSetCharFinally
+				# 			strCompare__secondStringSetCharToPrevious:
+				# 				lb $t5, -1($t1)
+				# 				j strCompare__secondStringSetCharFinally
 
-							strCompare__secondStringSetCharFinally:
-								sub $t6, $t4, $t5 # differenza: è il valore di return effettivo se char diversi
-								move $v1, $t6
-								j strCompare__finallyLogic
+				# 			strCompare__secondStringSetCharFinally:
+				# 				sub $t6, $t4, $t5 # differenza: è il valore di return effettivo se char diversi
+				# 				move $v1, $t6
+				# 				j strCompare__finallyLogic
 
 			strCompare__isCharEqualLogic:
 				beq $t2, $zero, strCompare__bothEqualStringFinishedLogic # controllo stringa finita: basta e avanza solo un controllo (visto che sappiamo che sono uguali)
