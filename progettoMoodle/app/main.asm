@@ -39,9 +39,9 @@ main:
 # @modifies {addr.char} $t1 - secondString char Address
 # @modifies {int.asciiCharCode} $t2 - firstString char asciiByteCode (il carattere viene trasformato in numero)
 # @modifies {int.asciiCharCode} $t3 - secondString char asciiByteCode (il carattere viene trasformato in numero)
-# @modifies {bool} $t4 - isFirstStringFinished (ovvero siamo già nel carattere \0)
-# @modifies {bool} $t5 - isSecondStringFinished (ovvero siamo già nel carattere \0)
-# @modifies {bool} $t6 - if(str1finished || str2finished): sappiamo che i caratteri non sono uguali ma vogliamo sapere una stringa è finita oppure no... se una delle due stringhe è finita questo valore deve dare TRUE
+# @modifies {int.asciiCharCode} $t4 - firstString char asciiByteCode (ma se nella ricerca si trova \0, $t4 diventa il char precedente cosi ci facilita il ritorno della differenza)
+# @modifies {int.asciiCharCode} $t5 - secondString char asciiByteCode (ma se nella ricerca si trova \0, $t4 diventa il char precedente cosi ci facilita il ritorno della differenza)
+# @modifies {int} $t6 - è la differenza ovvero il valore di return se char diversi tra str1 e str2
 strCompare:
 	move $t0, $a1 # charAddressFirstString
 	move $t1, $a2 # charAddressSecondString
@@ -52,16 +52,29 @@ strCompare:
 
 		beq $t2, $t3, strCompare__isCharEqualLogic
 			strCompare__isCharNotEqualLogic:
-				# TODO: fai che controlli se con un $t se il carattere è zero, se si vai dietro e usi il carattere precedente
-				# TODO: se non è zero allora usa questo carattere e salvi in $t5 e $t6 i caratteri che poi userai per la logica differenza.
-				
-				# CODICE VECCHIO DA CANCELLARE CHE NON MI PIACE
-				# seq $t4, $t2, $zero # isFirstStringFinished
-				# seq $t5, $t3, $zero # isSecondStringFinished
-				# or $t6, $t4, $t5 # hasAtLeastOneFinishedStringBetweenTheTwoStrings: se si valore TRUE altrimenti FALSE
+				beq $t2, $zero, strCompare__firstStringSetCharToPrevious
+					strCompare__firstStringSetCharToCurrent:
+						lb $t4, 0($t0)
+						j strCompare__firstStringSetCharFinally
 
-				
-				j strCompare__finallyLogic
+					strCompare__firstStringSetCharToPrevious:
+						lb $t4, -1($t0) # il carattere prima di \0 cosi non facciamo sottrazione con \0
+						j strCompare__firstStringSetCharFinally
+
+					strCompare__firstStringSetCharFinally:
+						beq $t3, $zero, strCompare__secondStringSetCharToPrevious
+							strCompare__secondStringSetCharToCurrent:
+								lb $t5, 0($t0)
+								j strCompare__secondStringSetCharFinally
+
+							strCompare__secondStringSetCharToPrevious:
+								lb $t5, -1($t0)
+								j strCompare__secondStringSetCharFinally
+
+							strCompare__secondStringSetCharFinally:
+								sub $t6, $t4, $t5 # differenza: è il valore di return effettivo se char diversi
+								move $v1, $t6
+								j strCompare__finallyLogic
 
 			strCompare__isCharEqualLogic:
 				beq $t2, $zero, strCompare__bothEqualStringFinishedLogic # controllo stringa finita: basta e avanza solo un controllo (visto che sappiamo che sono uguali)
