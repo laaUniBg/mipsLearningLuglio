@@ -34,7 +34,7 @@ main:
 
 # @arg {addr.string} $a1 - firstString
 # @arg {addr.string} $a2 - secondString
-# @returns {int} - ritorna 0 se uguale, ritorna valore negativo se alfabeticamente firstString precede secondString, ritorna valore positivo se alfabeticamente firstString succede secondString.
+# @returns {int} $v1 - ritorna 0 se uguale, ritorna valore negativo se alfabeticamente firstString precede secondString, ritorna valore positivo se alfabeticamente firstString succede secondString.
 strCompare:
 	move $t0, $a1 # firstStringCharAddress
 	move $t1, $a2 # secondStringCharAddress
@@ -43,11 +43,16 @@ strCompare:
 		lb $t2, 0($t0) # firstStringThisCharASCIIbyteCode
 		lb $t3, 0($t1) # secondStringThisCharASCIIbyteCode
 		beq $t2, $t3, strCompare__isCharEqualLogic
+			strCompare__isCharNotEqualLogic:
+				# fai la logica della differenza e returni la differenza (ovviamente se il carattere è \0 returni il valore precedente a \0 oppure devi fare un controllo prima.)
+				
+				j strCompare__finallyLogic
+
 			strCompare__isCharEqualLogic:
+				# se entrambi sono \0 allora ritorni direttamente 0
 				addi $t0, $t0, 1 # firstString nextChar address
 				addi $t1, $t1, 1 # secondString nextChar address
-
-
+			
 	strCompare__finallyLogic:
 		jr $ra
 
