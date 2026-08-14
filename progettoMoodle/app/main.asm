@@ -64,11 +64,11 @@ strCompare:
 					strCompare__firstStringSetCharFinally:
 						beq $t3, $zero, strCompare__secondStringSetCharToPrevious
 							strCompare__secondStringSetCharToCurrent:
-								lb $t5, 0($t0)
+								lb $t5, 0($t1)
 								j strCompare__secondStringSetCharFinally
 
 							strCompare__secondStringSetCharToPrevious:
-								lb $t5, -1($t0)
+								lb $t5, -1($t1)
 								j strCompare__secondStringSetCharFinally
 
 							strCompare__secondStringSetCharFinally:
