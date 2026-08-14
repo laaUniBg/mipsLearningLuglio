@@ -35,24 +35,45 @@ main:
 # @arg {addr.string} $a1 - firstString
 # @arg {addr.string} $a2 - secondString
 # @returns {int} $v1 - ritorna 0 se uguale, ritorna valore negativo se alfabeticamente firstString precede secondString, ritorna valore positivo se alfabeticamente firstString succede secondString.
+# @modifies {addr.char} $t0 - firstString char Address
+# @modifies {addr.char} $t1 - secondString char Address
+# @modifies {int.asciiCharCode} $t2 - firstString char asciiByteCode (il carattere viene trasformato in numero)
+# @modifies {int.asciiCharCode} $t3 - secondString char asciiByteCode (il carattere viene trasformato in numero)
+# @modifies {bool} $t4 - isFirstStringFinished (ovvero siamo già nel carattere \0)
+# @modifies {bool} $t5 - isSecondStringFinished (ovvero siamo già nel carattere \0)
+# @modifies {bool} $t6 - if(str1finished || str2finished): sappiamo che i caratteri non sono uguali ma vogliamo sapere una stringa è finita oppure no... se una delle due stringhe è finita questo valore deve dare TRUE
 strCompare:
-	move $t0, $a1 # firstStringCharAddress
-	move $t1, $a2 # secondStringCharAddress
+	move $t0, $a1 # charAddressFirstString
+	move $t1, $a2 # charAddressSecondString
 	
 	strCompare__innerLoop:
-		lb $t2, 0($t0) # firstStringThisCharASCIIbyteCode
-		lb $t3, 0($t1) # secondStringThisCharASCIIbyteCode
+		lb $t2, 0($t0) # thisChar ASCIIbyteCode FirstString
+		lb $t3, 0($t1) # thisChar ASCIIbyteCode SecondString
+
 		beq $t2, $t3, strCompare__isCharEqualLogic
 			strCompare__isCharNotEqualLogic:
-				# fai la logica della differenza e returni la differenza (ovviamente se il carattere è \0 returni il valore precedente a \0 oppure devi fare un controllo prima.)
+				# TODO: fai che controlli se con un $t se il carattere è zero, se si vai dietro e usi il carattere precedente
+				# TODO: se non è zero allora usa questo carattere e salvi in $t5 e $t6 i caratteri che poi userai per la logica differenza.
+				
+				# CODICE VECCHIO DA CANCELLARE CHE NON MI PIACE
+				# seq $t4, $t2, $zero # isFirstStringFinished
+				# seq $t5, $t3, $zero # isSecondStringFinished
+				# or $t6, $t4, $t5 # hasAtLeastOneFinishedStringBetweenTheTwoStrings: se si valore TRUE altrimenti FALSE
+
 				
 				j strCompare__finallyLogic
 
 			strCompare__isCharEqualLogic:
-				# se entrambi sono \0 allora ritorni direttamente 0
-				addi $t0, $t0, 1 # firstString nextChar address
-				addi $t1, $t1, 1 # secondString nextChar address
-			
+				beq $t2, $zero, strCompare__bothEqualStringFinishedLogic # controllo stringa finita: basta e avanza solo un controllo (visto che sappiamo che sono uguali)
+					strCompare__stillLoopingLogic:
+						addi $t0, $t0, 1 # firstString nextChar address
+						addi $t1, $t1, 1 # secondString nextChar address
+						j strCompare__innerLoop
+
+					strCompare__bothEqualStringFinishedLogic:
+						move $v1, $zero # $zero significa uguali
+						j strCompare__finallyLogic
+
 	strCompare__finallyLogic:
 		jr $ra
 
