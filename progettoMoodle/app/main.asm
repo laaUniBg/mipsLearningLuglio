@@ -38,13 +38,18 @@ main:
 strCompare:
 	move $t0, $a1 # firstStringCharAddress
 	move $t1, $a2 # secondStringCharAddress
-	lb $t2, 0($t0) # firstCharASCIIbyteCode
-	lb $t3, 0($t1) # secondCharASCIIbyteCode
-	beq $t2, $t3, strCompare__isCharEqualLogic
-	# TODO: ricorda anche \0 per la fine della stringa pero se entrambi finiscono con \0 significa che diamo zero come risultato... se invece non finiscono uguale ricordiamo ultimo valore. magari un buffer con ultimo risultato
-		strCompare__isCharEqualLogic:
-		# TODO:
-	jr $ra
+	
+	strCompare__innerLoop:
+		lb $t2, 0($t0) # firstStringThisCharASCIIbyteCode
+		lb $t3, 0($t1) # secondStringThisCharASCIIbyteCode
+		beq $t2, $t3, strCompare__isCharEqualLogic
+			strCompare__isCharEqualLogic:
+				addi $t0, $t0, 1 # firstString nextChar address
+				addi $t1, $t1, 1 # secondString nextChar address
+
+
+	strCompare__finallyLogic:
+		jr $ra
 
 # @arg {addr.arrayOfStructs} $a0 - arrayOfStructsAddress: una mappa nel nostro caso è un array di structs ovvero un array di strutture dati ordinate. (io generalmente parto da $a1 per gli argomento per evitare di sovrascrivere syscall methods ma quindi ho bisogno di tanti argomenti quindi parto da 0... quindi ricorda che se modifichi il codice e aggiungi qualche syscall di salvarla nello stack momentaneamente per evitare bugs)
 # @arg {int} $t8 - sizeOfArrayOfStructs: serve per decidere quando fermarsi nella ricerca per ritornare il NOT_FOUND ovvero -1
