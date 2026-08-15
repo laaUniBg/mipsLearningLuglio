@@ -39,9 +39,6 @@ main:
 # @modifies {addr.char} $t1 - secondString char Address
 # @modifies {int.asciiCharCode} $t2 - firstString char asciiByteCode (il carattere viene trasformato in numero)
 # @modifies {int.asciiCharCode} $t3 - secondString char asciiByteCode (il carattere viene trasformato in numero)
-# @modifies {int.asciiCharCode} $t4 - firstString char asciiByteCode (ma se nella ricerca si trova \0, $t4 diventa il char precedente cosi ci facilita il ritorno della differenza)
-# @modifies {int.asciiCharCode} $t5 - secondString char asciiByteCode (ma se nella ricerca si trova \0, $t4 diventa il char precedente cosi ci facilita il ritorno della differenza)
-# @modifies {int} $t6 - è la differenza ovvero il valore di return se char diversi tra str1 e str2
 strCompare:
 	move $t0, $a1 # charAddressFirstString
 	move $t1, $a2 # charAddressSecondString
@@ -50,48 +47,10 @@ strCompare:
 		lb $t2, 0($t0) # thisChar ASCIIbyteCode FirstString
 		lb $t3, 0($t1) # thisChar ASCIIbyteCode SecondString
 
-		seq $t4, $t2, $zero # isFirstStringFinished
-		seq $t5, $t3, $zero # isSecondStringFinished
-
-		and $t6, $t4, $t5  # isBothStringsFinished
-		or $t7, $t4, $t5 # isAtLeastOneStringFinished
-
-		and $t8
-
-
-		beq $t6, FALSE, strCompare__stillLoopingLogic # 
-			strCompare__stillLoopingLogic:
-				addi $t0, $t0, 1 # firstString nextChar address
-				addi $t1, $t1, 1 # secondString nextChar address
-				j strCompare__innerLoop
-
 		beq $t2, $t3, strCompare__isCharEqualLogic
 			strCompare__isCharNotEqualLogic:
 				sub $v1, $t2, $t3
 				j finallyLogic
-				# beq $t2, $zero, strCompare__firstStringSetCharToPrevious
-				# 	strCompare__firstStringSetCharToCurrent:
-				# 		lb $t4, 0($t0)
-				# 		j strCompare__firstStringSetCharFinally
-
-				# 	strCompare__firstStringSetCharToPrevious:
-				# 		lb $t4, -1($t0) # il carattere prima di \0 cosi non facciamo sottrazione con \0
-				# 		j strCompare__firstStringSetCharFinally
-
-				# 	strCompare__firstStringSetCharFinally:
-				# 		beq $t3, $zero, strCompare__secondStringSetCharToPrevious
-				# 			strCompare__secondStringSetCharToCurrent:
-				# 				lb $t5, 0($t1)
-				# 				j strCompare__secondStringSetCharFinally
-
-				# 			strCompare__secondStringSetCharToPrevious:
-				# 				lb $t5, -1($t1)
-				# 				j strCompare__secondStringSetCharFinally
-
-				# 			strCompare__secondStringSetCharFinally:
-				# 				sub $t6, $t4, $t5 # differenza: è il valore di return effettivo se char diversi
-				# 				move $v1, $t6
-				# 				j strCompare__finallyLogic
 
 			strCompare__isCharEqualLogic:
 				beq $t2, $zero, strCompare__bothEqualStringFinishedLogic # controllo stringa finita: basta e avanza solo un controllo (visto che sappiamo che sono uguali)
@@ -164,22 +123,21 @@ getAddressOfStudentUsingIndex:
 	stackPreserveEnd($ra)
 	jr $ra
 
-# @arg {addr} $a1 - indirizzoStringaDaPrintare
+# @arg {addr.string} $a1 - indirizzoStringaDaPrintare
 printStringFromAddress:
     li $v0, 4
     move $a0, $a1
     syscall
     jr $ra
 
-
-# # @arg      {int}   $a1 - indexStudent (valore a 0 a 49)
-# # @returns  {addr}  $v1 - offsetThisStudent (absolute con riferimento ram)
-# # @modifies $t0, $t1
-# returnAddressStudentByIndex:
-# 	mul $t0, $a1, SIZE_STUDENT_STRUCT    # offsetThisStudente (relative)
-# 	la $t1, studentStructsArray          # inizio posizione ram array studenti
-# 	add $v1, $t0, $t1                    # offsetThisStudent (absolute)
-#     jr $ra
+# @arg      {int}   $a1 - indexStudent (valore a 0 a 49)
+# @returns  {addr.StudentOfArrayOfStructs}  $v1 - offsetThisStudent (absolute con riferimento ram)
+# @modifies $t0, $t1
+returnAddressStudentByIndex:
+	mul $t0, $a1, SIZE_STUDENT_STRUCT    # offsetThisStudente (relative)
+	la $t1, studentStructsArray          # inizio posizione ram array studenti
+	add $v1, $t0, $t1                    # offsetThisStudent (absolute)
+    jr $ra
 
 .macro stackPreserveStart(%registerToSave)
     addi $sp, $sp, -4
